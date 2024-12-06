@@ -19,13 +19,13 @@ async def get_status(job_id: str):
     job = jobs[job_id]
     elapsed_time = time.time() - job["start_time"]
     
-    # Simulate random errors (optional)
-    if random.random() < 0.15:  # 15% chance of error
-        return {"result": "error"}
-    
-    # Return completed if enough time has passed
+    # Check completion first
     if elapsed_time >= job["duration"]:
         return {"result": "completed"}
+    
+    # Then check for random errors for pending jobs
+    if random.random() < 0.15:  # 15% chance of error
+        return {"result": "error"}
     
     # Otherwise return pending
     return {"result": "pending"}
