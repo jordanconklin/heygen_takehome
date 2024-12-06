@@ -63,7 +63,7 @@ class TranslationStatusPoller:
         if not job_id or not isinstance(job_id, str):
             raise InvalidJobIdError(job_id)
 
-
+        # Timing variables initialized
         start_time = asyncio.get_event_loop().time()
         self.current_interval = self.initial_interval
         self.total_elapsed_time = 0
@@ -75,6 +75,7 @@ class TranslationStatusPoller:
                 current_time = asyncio.get_event_loop().time()
                 elapsed = current_time - start_time
                 
+                # Print timing information
                 if self.last_poll_time:
                     time_since_last_poll = current_time - self.last_poll_time
                     self.total_elapsed_time += time_since_last_poll
@@ -82,9 +83,11 @@ class TranslationStatusPoller:
                 
                 self.last_poll_time = current_time
 
+                # Check for timeout
                 if elapsed > timeout:
                     raise TimeoutError(timeout, elapsed)
                 
+                # GET request to check status
                 try:
                     async with session.get(f"{self.base_url}/status/{job_id}") as response:
                         if response.status == 404:
@@ -93,18 +96,22 @@ class TranslationStatusPoller:
                             response_text = await response.text()
                             raise ApiError(response.status, response_text)
                         
+                        # Parse the response
                         data = await response.json()
                         status = data.get("result")
                         print(f"Status: {status}")
                         
+                        # Return the data if the job is completed
                         if status == "completed":
                             return data
                         elif status == "error":
                             raise TranslationFailedError(job_id)
                         
+                        # Wait for the next interval
                         await asyncio.sleep(self.current_interval)
                         self.get_next_interval()
                 
+                # Handle network errors
                 except aiohttp.ClientError as e:
                     raise ApiError(0, f"Network error: {str(e)}")
 

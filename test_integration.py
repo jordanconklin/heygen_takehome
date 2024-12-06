@@ -49,6 +49,7 @@ async def test_translation_flow():
             os.kill(server.pid, signal.CTRL_C_EVENT)
         else:  # Unix/Linux/MacOS
             server.terminate()
+        # This blocks to wait for the server to terminate
         server.wait()
 
 # Run the test
