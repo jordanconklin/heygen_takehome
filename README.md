@@ -56,3 +56,14 @@ The mock server simulates:
 - Random job durations (15-30 seconds)
 - 15% random error rate
 - Realistic async behavior
+
+## Testing
+
+Run the integration tests:
+```bash
+python test_integration.py
+``` 
+This will test:
+- Successful translation completion
+- Error handling
+- Timeout functionality
